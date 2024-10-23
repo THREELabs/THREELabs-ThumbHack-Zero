@@ -1,1 +1,1 @@
-# THREELabs-Thumbtrix
+# THREELabs-ThumbHackZero
