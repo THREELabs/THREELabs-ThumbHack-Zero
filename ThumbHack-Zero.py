@@ -190,6 +190,15 @@ def run_level_one():
     game = HackingMinigame(1)
     game.generate_sequence()
     
+    # Add button state tracking
+    last_button_state = {
+        'U': False,
+        'D': False,
+        'L': False,
+        'R': False,
+        'B': False
+    }
+    
     while game.time_left > 0:
         thumby.display.fill(0)
         
@@ -206,27 +215,46 @@ def run_level_one():
             x = 10 + (i * 10)
             thumby.display.drawText(direction, x, 25, 1)
             
-        # Handle input
-        if thumby.buttonU.pressed():
+        # Handle input with debouncing
+        if thumby.buttonU.pressed() and not last_button_state['U']:
             if len(game.player_sequence) < len(game.sequence):
                 game.player_sequence.append('U')
                 thumby.audio.play(1200, 50)
-        elif thumby.buttonD.pressed():
+            last_button_state['U'] = True
+        elif not thumby.buttonU.pressed():
+            last_button_state['U'] = False
+            
+        if thumby.buttonD.pressed() and not last_button_state['D']:
             if len(game.player_sequence) < len(game.sequence):
                 game.player_sequence.append('D')
                 thumby.audio.play(1200, 50)
-        elif thumby.buttonL.pressed():
+            last_button_state['D'] = True
+        elif not thumby.buttonD.pressed():
+            last_button_state['D'] = False
+            
+        if thumby.buttonL.pressed() and not last_button_state['L']:
             if len(game.player_sequence) < len(game.sequence):
                 game.player_sequence.append('L')
                 thumby.audio.play(1200, 50)
-        elif thumby.buttonR.pressed():
+            last_button_state['L'] = True
+        elif not thumby.buttonL.pressed():
+            last_button_state['L'] = False
+            
+        if thumby.buttonR.pressed() and not last_button_state['R']:
             if len(game.player_sequence) < len(game.sequence):
                 game.player_sequence.append('R')
                 thumby.audio.play(1200, 50)
-        elif thumby.buttonB.pressed():
+            last_button_state['R'] = True
+        elif not thumby.buttonR.pressed():
+            last_button_state['R'] = False
+            
+        if thumby.buttonB.pressed() and not last_button_state['B']:
             if game.player_sequence:
                 game.player_sequence.pop()
                 thumby.audio.play(800, 50)
+            last_button_state['B'] = True
+        elif not thumby.buttonB.pressed():
+            last_button_state['B'] = False
                 
         # Check win condition
         if len(game.player_sequence) == len(game.sequence):
@@ -234,6 +262,8 @@ def run_level_one():
                 return True
             else:
                 game.player_sequence = []
+                thumby.audio.play(400, 100)  # Error sound
+                time.sleep(0.5)  # Add slight delay after incorrect sequence
                 
         game.time_left -= 1
         thumby.display.update()
